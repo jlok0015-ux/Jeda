@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jeda: Clickable Checkout Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFE9E0;--screen:#F6F1EA;--card:#fff;--ink:#2F3E34;--mute:#6B7A6E;--sage:#9DB593;--deep:#4F6B4E;--terra:#C88B6B;--terrad:#A9603F;--terral:#EBD3C4;--tint:#E6EEE1;--line:#BFCBB9;--frame:#2F3E34;--onbtn:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151c17;--screen:#1f2a23;--card:#2a3830;--ink:#F0ECE4;--mute:#A9B7AC;--deep:#8FB58A;--terrad:#E0A582;--terral:#4a3a30;--tint:#2b3d31;--line:#42544a;--frame:#0c110e;--onbtn:#14201a}}
+:root[data-theme="dark"]{--bg:#151c17;--screen:#1f2a23;--card:#2a3830;--ink:#F0ECE4;--mute:#A9B7AC;--deep:#8FB58A;--terrad:#E0A582;--terral:#4a3a30;--tint:#2b3d31;--line:#42544a;--frame:#0c110e;--onbtn:#14201a}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{min-height:100%;background:var(--bg);color:var(--ink);font-family:'Poppins',ui-rounded,system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:14px 12px 24px}
+h1{font-size:15px;font-weight:600;color:var(--deep);letter-spacing:.2px}
+.sub{font-size:12px;color:var(--mute);margin:2px 0 12px;text-align:center}
+.phone{width:min(340px,100%);height:640px;background:var(--frame);border-radius:38px;padding:9px;position:relative}
+.scr{width:100%;height:100%;background:var(--screen);border-radius:30px;overflow:hidden;position:relative}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:80px;height:20px;background:var(--frame);border-radius:12px;z-index:5}
+.s{position:absolute;inset:0;padding:44px 18px 18px;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateY(14px);transition:opacity .4s,transform .4s}
+.s.on{opacity:1;pointer-events:auto;transform:none}
+.s.tint{background:var(--tint)}
+.brand{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--deep);font-size:17px}
+.brand svg{width:18px;height:22px}
+.card{background:var(--card);border-radius:14px;padding:12px 14px}
+.row{display:flex;justify-content:space-between;align-items:center}
+.lbl{font-size:12px;color:var(--mute);font-weight:500;margin:14px 0 6px}
+.opt{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 13px;font-size:13.5px;font-weight:500;cursor:pointer;text-align:left;color:var(--ink);font-family:inherit;width:100%;display:flex;justify-content:space-between;margin-bottom:8px}
+.opt.sel{border-color:var(--terra);border-width:2px;font-weight:600}
+.opt small{display:block;font-weight:400;color:var(--mute);font-size:11.5px;margin-top:2px}
+.pill{margin-top:8px;background:var(--tint);border:2px solid var(--deep);border-radius:16px;padding:12px;display:flex;align-items:center;gap:10px;animation:glow 2.4s ease-in-out infinite}
+.pill b{color:var(--deep);font-size:16px;display:block;line-height:1.1}
+.pill span{font-size:12px;color:var(--mute)}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(157,181,147,.55)}50%{box-shadow:0 0 0 7px rgba(157,181,147,0)}}
+.shake{animation:sh .45s}
+@keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.btn{border:0;border-radius:999px;padding:12px 16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;background:var(--deep);color:var(--onbtn)}
+.btn.ghost{background:transparent;border:2px solid var(--deep);color:var(--deep)}
+.btn.dim{background:var(--line);color:var(--mute)}
+.btn.sm{padding:8px 14px;font-size:12.5px;margin-left:auto}
+.big{font-size:20px;font-weight:500;text-align:center;margin-top:18px;line-height:1.3}
+.amt{font-size:52px;font-weight:700;color:var(--terrad);text-align:center;line-height:1.1;margin:6px 0 0}
+.tag{background:var(--terra);color:#fff;font-size:9.5px;font-weight:700;padding:4px 9px;border-radius:99px;letter-spacing:.4px}
+.bar{display:flex;height:16px;border-radius:8px;overflow:hidden;border:1px solid var(--line);margin:8px 0 10px;background:var(--card)}
+.bar i{display:block;height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.leg{display:flex;justify-content:space-between;font-size:12.5px;margin:4px 0;align-items:center}
+.leg em{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;border:1px solid var(--line)}
+.prog{height:7px;background:var(--tint);border-radius:4px;overflow:hidden;margin:8px 0 6px}
+.prog i{display:block;height:100%;width:55%;background:var(--sage);border-radius:4px;transition:width 1s}
+.foot{margin-top:auto;font-size:11px;color:var(--mute);text-align:center;font-style:italic;padding-top:8px}
+.tick{width:64px;height:64px;border-radius:50%;background:var(--sage);display:grid;place-items:center;margin:26px auto 12px;color:#fff;font-size:30px}
+.dots{display:flex;gap:6px;margin-top:12px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.3s}
+.dots i.on{background:var(--deep);width:22px;border-radius:5px}
+.reset{margin-top:10px;background:none;border:0;color:var(--mute);font:500 12px Poppins,sans-serif;text-decoration:underline;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>Jeda · Pause before you split</h1>
+<p class="sub">Tap through Aisha's checkout. Illustrative scenario, fictional brand.</p>
+<div class="phone"><div class="scr"><div class="notch"></div>
+
+<!-- 0 checkout -->
+<section class="s on" id="s0">
+ <div style="font-weight:600;font-size:14px">‹ Checkout</div>
+ <div class="card row" style="margin-top:14px;gap:12px"><div style="width:52px;height:52px;border-radius:10px;background:var(--tint);display:grid;place-items:center;font-size:24px">🎧</div><div><div style="font-size:13px;font-weight:600">Wireless Headphones</div><div style="font-size:19px;font-weight:700;color:var(--deep)">RM489.00</div></div></div>
+ <div class="lbl">Pay with</div>
+ <button class="opt" id="full"><span>Pay in full</span><span>RM489</span></button>
+ <button class="opt sel" id="split"><span>Split in 3</span><span style="color:var(--terrad);font-weight:700">RM163 / mo</span></button>
+ <div class="pill" id="pill"><svg width="26" height="32" viewBox="0 0 26 32"><path d="M2 14C2 3 12 1 12 12V30C4 30 2 22 2 14Z" fill="#4F6B4E"/><path d="M14 3C25 4 26 22 14 30Z" fill="#4F6B4E"/></svg>
+  <div><b>Jeda</b><span>Pause first? 30 seconds</span></div><button class="btn sm" onclick="go(1)">Pause</button></div>
+ <div class="foot" style="margin-top:auto">The pause sits before the confirm.</div>
+ <button class="btn dim" id="confirm">Confirm order</button>
+</section>
+
+<!-- 1 full price test -->
+<section class="s tint" id="s1">
+ <div class="row"><div class="brand"><svg viewBox="0 0 26 32"><path d="M2 14C2 3 12 1 12 12V30C4 30 2 22 2 14Z" fill="currentColor"/><path d="M14 3C25 4 26 22 14 30Z" fill="currentColor"/></svg>Jeda</div><span class="tag">FULL PRICE TEST</span></div>
+ <div class="big">Would you still buy it if you paid</div>
+ <div class="amt">RM489</div><div class="big" style="margin-top:2px">today?</div>
+ <div class="card" style="margin-top:18px;font-size:12px"><div class="row"><span style="color:var(--mute)">How it feels</span><b style="background:var(--terral);color:var(--terrad);padding:2px 9px;border-radius:5px">RM163</b></div><div class="row" style="margin-top:7px"><span style="color:var(--mute)">What it is</span><b style="background:var(--terra);color:#fff;padding:2px 9px;border-radius:5px">RM489</b></div></div>
+ <div style="margin-top:auto;display:grid;gap:9px"><button class="btn" onclick="go(2)">Yes, still worth it</button><button class="btn ghost" onclick="go(2)">Hmm, let me look</button><div class="foot">No wrong answer. Just a pause.</div></div>
+</section>
+
+<!-- 2 see it all -->
+<section class="s" id="s2">
+ <div class="lbl" style="margin-top:0">See it all</div><div style="font-size:20px;font-weight:700;margin-top:-4px">Your RM3,200 month</div>
+ <div class="bar"><i data-w="50" style="background:var(--line)"></i><i data-w="19" style="background:var(--terral)"></i><i data-w="5" style="background:var(--terra)"></i></div>
+ <div class="leg"><span><em style="background:var(--line)"></em>Essentials</span><b>RM1,600</b></div>
+ <div class="leg"><span><em style="background:var(--terral)"></em>Your 3 current plans</span><b>RM612</b></div>
+ <div class="leg"><span><em style="background:var(--terra)"></em>This purchase</span><b>RM163</b></div>
+ <div class="leg"><span><em style="background:var(--card)"></em>Left for you</span><b>RM825</b></div>
+ <div class="card" style="margin-top:12px"><div style="font-size:15px;font-weight:700;line-height:1.3">Instalments would take <span style="color:var(--terrad)">24%</span> of your income.</div><div style="font-size:12px;color:var(--mute);margin-top:3px">Up from 19% today.</div></div>
+ <div class="card" style="margin-top:10px"><div style="font-size:13px;font-weight:600">Your Bali trip fund</div><div class="prog"><i></i></div><div style="font-size:13px;font-weight:700;color:var(--terrad)">Arrives 6 weeks later</div></div>
+ <button class="btn" style="margin-top:auto" onclick="go(3)">See my options</button>
+</section>
+
+<!-- 3 your call -->
+<section class="s" id="s3">
+ <div style="font-size:24px;font-weight:700">Your call.</div><div style="font-size:12px;color:var(--mute);font-style:italic;margin:2px 0 12px">Four ways forward. All yours.</div>
+ <button class="opt sel" onclick="done('split')"><span>Split it. I'm sure.<small>RM163 × 3 months</small></span></button>
+ <button class="opt" onclick="done('wait')"><span>Wait 14 days<small>Jeda tracks the price and reminds you</small></span></button>
+ <button class="opt" onclick="done('full')"><span>Pay in full<small>RM489 today, no instalments</small></span></button>
+ <button class="opt" onclick="done('alt')"><span>Compare a similar pick<small>RM329 · saves RM160</small></span></button>
+ <div class="foot" style="margin-top:auto"><b style="color:var(--deep);font-style:normal">Nothing is blocked. You decide.</b></div>
+</section>
+
+<!-- 4 done -->
+<section class="s tint" id="s4">
+ <div class="tick">✓</div>
+ <div class="big" id="dt" style="margin-top:0"></div>
+ <div style="text-align:center;font-size:13px;color:var(--mute);margin-top:10px;line-height:1.5" id="dd"></div>
+ <div style="margin-top:auto;display:grid;gap:9px"><button class="btn" onclick="go(3)">Back to my options</button><button class="btn ghost" onclick="go(0)">Start again</button></div>
+</section>
+
+</div></div>
+<div class="dots" id="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+<p class="sub" style="margin-top:10px">Pause. See it all. Then pay.</p>
+
+<script>
+var cur=0,S=[].slice.call(document.querySelectorAll('.s')),D=[].slice.call(document.querySelectorAll('#dots i'));
+function go(n){
+  S[cur].classList.remove('on');cur=n;S[n].classList.add('on');
+  D.forEach(function(d,i){d.classList.toggle('on',i===Math.min(n,4))});
+  if(n===2){var b=S[2].querySelectorAll('.bar i');b.forEach(function(x){x.style.width='0'});setTimeout(function(){b.forEach(function(x){x.style.width=x.dataset.w+'%'})},120)}
+}
+var MSG={split:['You chose this deliberately.','RM163 a month for 3 months. Jeda will keep your total in view across all providers.'],
+wait:['Good pause. Reminder set for day 14.','Jeda tracks the price and will ask “Still want it?” with a fresh Full Price Test. Your Bali fund stays on track.'],
+full:['Paid in full. No instalments added.','Your plans stay at 19% of income and your Bali fund stays on schedule.'],
+alt:['A similar pick: RM329.','That saves RM160 and keeps instalments closer to 23% of income. Compare, then decide.']};
+function done(k){document.getElementById('dt').textContent=MSG[k][0];document.getElementById('dd').textContent=MSG[k][1];go(4)}
+document.getElementById('confirm').onclick=function(){var p=document.getElementById('pill');p.classList.remove('shake');void p.offsetWidth;p.classList.add('shake')};
+document.getElementById('full').onclick=function(){this.classList.add('sel');document.getElementById('split').classList.remove('sel')};
+document.getElementById('split').onclick=function(){this.classList.add('sel');document.getElementById('full').classList.remove('sel')};
+</script>
+</body>
+</html>
